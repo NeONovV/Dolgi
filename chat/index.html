@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="userCount"></div>
+    <div class="chat">
+        <ul class="messages"></ul>
+        <form class="message-utils">
+            <div class="emojies">
+                <button type="button">&#x1F9D0</button>
+                <button type="button">&#x1F603</button>
+                <button type="button">&#x1F60E</button>
+                <button type="button">&#x1F642</button>
+                <button type="button">&#x1F60A</button>
+                <button type="button">&#x1F627</button>
+            </div>
+            <button type="button" class="emojie-choice">&#x1F600</button>
+            <input type="text" class="input" autofocus>
+            <button type="submit" class="send-message">Send</button>
+        </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        const messages = document.querySelector('.messages');
+        const messageForm = document.querySelector('.message-utils');
+        const nameInput = document.querySelector('.name')
+        const input = document.querySelector('.input');
+        const emojies = document.querySelector('.emojies')
+        const memberCounter = document.querySelector(".userCount")
+        const socket = io();
+        const username = prompt("Enter your name", "");
+        socket.emit("new user", username);
+
+        emojies.addEventListener('click', e => {
+            input.value += e.target.innerText
+        })
+        messageForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value != "") {
+                socket.emit('messageFromClient', input.value);
+                input.value = '';
+            }
+        });
+
+        socket.on('messageFromServer', (msg) => {
+            const item = document.createElement('li');
+            item.innerHTML = msg;
+            messages.appendChild(item);
+        });
+
+        socket.on("members", (total) => {
+            memberCounter.textContent = `Всего участников: ${total}`
+        })
+    </script>
+
+    </script>
+</body>
+</html>
